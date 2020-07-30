@@ -1,0 +1,24 @@
+---
+# tasks/pre_check.yml (clickhouse)
+# Prefix : (clickhouse)
+
+- name: Check for deleted variables
+  shell: >-
+    echo "[WARNING]: 以下の変数は削除されました. 以下の URL を確認してください. @y_hashida";
+    echo "    https://github.com/link-u/ansible-roles-v2_clickhouse/blob/master/README.md#削除された変数の一覧";
+    {% if clickhouse_hosts is defined %}
+      echo "clickhouse_hosts";
+    {% endif %}
+
+    {% if clickhouse_host_ips is defined %}
+      echo "clickhouse_host_ips";
+    {% endif %}
+
+    {% if clickhouse_change_ufw is defined %}
+      echo "clickhouse_change_ufw";
+    {% endif %}
+  register: __clickhouse_check_deleted_vars
+  check_mode: no
+  changed_when:
+    - (__clickhouse_check_deleted_vars.stdout_lines | length) != 2
+  notify: "Print warning for clickhouse (Check for deleted variables)"
