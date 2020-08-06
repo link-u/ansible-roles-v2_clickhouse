@@ -97,3 +97,11 @@ clickhouse_extra_users: []
 
 * `clickhouse_hosts`, `clickhouse_host_ips`, `clickhouse_change_ufw`
   * これらの変数は ufw の設定に関する項目であり, それらは ufw role で実行する方針に切り替えたためこの role からは削除しました.
+
+## License
+
+Unless otherwise stated this repository licensed under MIT license. Please read [LICENSE](LICENSE) for the details.
+
+### templates/*.xml.j2
+
+The original version of `templates/*.xml.j2` is obtained from https://clickhouse.tech/ is licensed under the Apache License 2.0. Please read [LICENSE.clickhouse](LICENSE.clickhouse) for the details.
