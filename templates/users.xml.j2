@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<yandex>
+    <!-- Profiles of settings. -->
+    <profiles>
+        <!-- Default settings. -->
+        <default>
+            <!-- Maximum memory usage for processing single query, in bytes. -->
+            <max_memory_usage>{{ clickhouse_max_memory_usage }}</max_memory_usage>
+
+            <!-- Maximum memory usage for processing all concurrently running queries for the user. Zero means unlimited. -->
+            <max_memory_usage_for_user>{{ clickhouse_max_memory_usage_for_user }}</max_memory_usage_for_user>
+
+            <!-- Maximum memory usage for processing all concurrently running queries on the server. Zero means unlimited. -->
+            <max_memory_usage_for_all_queries>{{ clickhouse_max_memory_usage_for_all_queries }}</max_memory_usage_for_all_queries>
+
+            <!-- Use cache of uncompressed blocks of data. Meaningful only for processing many of very short queries. -->
+            <use_uncompressed_cache>0</use_uncompressed_cache>
+
+            <!-- How to choose between replicas during distributed query processing.
+                 random - choose random replica from set of replicas with minimum number of errors
+                 nearest_hostname - from set of replicas with minimum number of errors, choose replica
+                  with minumum number of different symbols between replica's hostname and local hostname
+                  (Hamming distance).
+                 in_order - first live replica is choosen in specified order.
+            -->
+            <load_balancing>random</load_balancing>
+        </default>
+
+        <!-- Profile that allows only read queries. -->
+        <readonly>
+            <readonly>1</readonly>
+        </readonly>
+    </profiles>
+
+    <!-- Users and ACL. -->
+    <users>
+        <!-- If user name was not specified, 'default' user is used. -->
+        <default>
+            <!-- Password could be specified in plaintext or in SHA256 (in hex format).
+
+                 If you want to specify password in plaintext (not recommended), place it in 'password' element.
+                 Example: <password>qwerty</password>.
+                 Password could be empty.
+
+                 If you want to specify SHA256, place it in 'password_sha256_hex' element.
+                 Example: <password_sha256_hex>65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5</password_sha256_hex>
+
+                 How to generate decent password:
+                 Execute: PASSWORD=$(base64 < /dev/urandom | head -c8); echo "$PASSWORD"; echo -n "$PASSWORD" | sha256sum | tr -d '-'
+                 In first line will be password and in second - corresponding SHA256.
+            -->
+{% if not clickhouse_user_default_password_hash %}
+            <password></password>
+{% else %}
+            <password_sha256_hex>{{ clickhouse_user_default_password_hash }}</password_sha256_hex>
+{% endif %}
+
+            <!-- List of networks with open access.
+
+                 To open access from everywhere, specify:
+                    <ip>::/0</ip>
+
+                 To open access only from localhost, specify:
+                    <ip>::1</ip>
+                    <ip>127.0.0.1</ip>
+
+                 Each element of list has one of the following forms:
+                 <ip> IP-address or network mask. Examples: 213.180.204.3 or 10.0.0.1/8 or 10.0.0.1/255.255.255.0
+		     2a02:6b8::3 or 2a02:6b8::3/64 or 2a02:6b8::3/ffff:ffff:ffff:ffff::.
+                 <host> Hostname. Example: server01.yandex.ru.
+                     To check access, DNS query is performed, and all received addresses compared to peer address.
+                 <host_regexp> Regular expression for host names. Example, ^server\d\d-\d\d-\d\.yandex\.ru$
+                     To check access, DNS PTR query is performed for peer address and then regexp is applied.
+                     Then, for result of PTR query, another DNS query is performed and all received addresses compared to peer address.
+                     Strongly recommended that regexp is ends with $
+                 All results of DNS requests are cached till server restart.
+            -->
+            <networks incl="networks" replace="replace">
+{% for ip in clickhouse_user_default_ip_list %}
+                <ip>{{ ip }}</ip>
+{% endfor %}
+            </networks>
+
+            <!-- Settings profile for user. -->
+            <profile>default</profile>
+
+            <!-- Quota for user. -->
+            <quota>default</quota>
+        </default>
+
+        <!-- Example of user with readonly access. -->
+        <readonly>
+{% if not clickhouse_user_readonly_password_hash %}
+            <password></password>
+{% else %}
+            <password_sha256_hex>{{ clickhouse_user_readonly_password_hash }}</password_sha256_hex>
+{% endif %}
+            <networks incl="networks" replace="replace">
+{% for ip in clickhouse_user_readonly_ip_list %}
+                <ip>{{ ip }}</ip>
+{% endfor %}
+            </networks>
+            <profile>readonly</profile>
+            <quota>default</quota>
+        </readonly>
+
+{% for user in clickhouse_extra_users %}
+        <{{ user.name }}>
+{% if not user.password_hash %}
+            <password></password>
+{% else %}
+            <password_sha256_hex>{{ user.password_hash }}</password_sha256_hex>
+{% endif %}
+            <networks incl="networks" replace="replace">
+{% for ip in user.allow_ip_list %}
+                <ip>{{ ip }}</ip>
+{% endfor %}
+            </networks>
+
+            <!-- Settings profile for user. -->
+            <profile>{{ user.profile }}</profile>
+
+            <!-- Quota for user. -->
+            <quota>default</quota>
+        </{{ user.name }}>
+{% endfor %}
+
+    </users>
+
+    <!-- Quotas. -->
+    <quotas>
+        <!-- Name of quota. -->
+        <default>
+            <!-- Limits for time interval. You could specify many intervals with different limits. -->
+            <interval>
+                <!-- Length of interval. -->
+                <duration>3600</duration>
+
+                <!-- No limits. Just calculate resource usage for time interval. -->
+                <queries>0</queries>
+                <errors>0</errors>
+                <result_rows>0</result_rows>
+                <read_rows>0</read_rows>
+                <execution_time>0</execution_time>
+            </interval>
+        </default>
+    </quotas>
+</yandex>

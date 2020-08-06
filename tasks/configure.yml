@@ -1,0 +1,19 @@
+---
+# defaults/configure.yml (clickhouse)
+# Prefix : clickhouse
+
+- name: Modify config.xml
+  template:
+    src: config.xml.j2
+    dest: /etc/clickhouse-server/config.xml
+  notify: Restart clickhouse-server
+  when:
+    - not clickhouse_install_client_only
+
+- name: Modify users.xml
+  template:
+    src: users.xml.j2
+    dest: /etc/clickhouse-server/users.xml
+  notify: Restart clickhouse-server
+  when:
+    - not clickhouse_install_client_only

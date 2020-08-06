@@ -1,0 +1,90 @@
+---
+# defaults/install.yml (clickhouse)
+# Prefix : clickhouse
+
+# FIXME(Ryo Hirafuji): ansible2.4からの不具合により、
+# プロキシの下では以下が失敗する
+# https://github.com/ansible/ansible/issues/31691
+#- name: Add an apt key
+#  apt_key:
+#    keyserver: keyserver.ubuntu.com
+#    id: E0C56BD4
+
+# https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE0C56BD4
+- name: Add an apt key
+  apt_key:
+    data: |
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
+      Version: SKS 1.1.6
+      Comment: Hostname: keyserver.ubuntu.com
+
+      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
+      8JsxnceVcuC7vfCrtg==
+      =W9u6
+      -----END PGP PUBLIC KEY BLOCK-----
+    state: present
+
+- name: Add repository
+  apt_repository:
+    repo: deb http://repo.yandex.ru/clickhouse/deb/stable/ main/
+    state: present
+  register: __clickhouse_add_apt_repo
+
+- name: Update apt repository
+  apt:
+    update_cache: yes
+  when: __clickhouse_add_apt_repo.changed | bool
+
+- name: Install clickhouse-server
+  apt:
+    pkg: clickhouse-server
+    update_cache: yes
+    cache_valid_time: 86400
+  when:
+    - not clickhouse_install_client_only
+
+- name: Install clickhouse-client
+  apt:
+    pkg: clickhouse-client
+    update_cache: yes
+    cache_valid_time: 86400
