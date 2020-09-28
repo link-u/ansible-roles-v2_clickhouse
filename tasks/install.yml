@@ -2,6 +2,12 @@
 # defaults/install.yml (clickhouse)
 # Prefix : clickhouse
 
+- name: Pre-install packages
+  apt:
+    name: "gpg"
+    state: present
+    update_cache: yes
+
 # FIXME(Ryo Hirafuji): ansible2.4からの不具合により、
 # プロキシの下では以下が失敗する
 # https://github.com/ansible/ansible/issues/31691
@@ -68,18 +74,11 @@
   apt_repository:
     repo: deb http://repo.yandex.ru/clickhouse/deb/stable/ main/
     state: present
-  register: __clickhouse_add_apt_repo
-
-- name: Update apt repository
-  apt:
-    update_cache: yes
-  when: __clickhouse_add_apt_repo.changed | bool
 
 - name: Install clickhouse-server
   apt:
-    pkg: clickhouse-server
+    name: clickhouse-server
     update_cache: yes
-    cache_valid_time: 86400
   when:
     - not clickhouse_install_client_only
 
@@ -87,4 +86,3 @@
   apt:
     pkg: clickhouse-client
     update_cache: yes
-    cache_valid_time: 86400

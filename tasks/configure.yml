@@ -6,6 +6,9 @@
   template:
     src: config.xml.j2
     dest: /etc/clickhouse-server/config.xml
+    owner: "root"
+    group: "root"
+    mode: "0644"
   notify: Restart clickhouse-server
   when:
     - not clickhouse_install_client_only
@@ -14,6 +17,9 @@
   template:
     src: users.xml.j2
     dest: /etc/clickhouse-server/users.xml
+    owner: "root"
+    group: "root"
+    mode: "0644"
   notify: Restart clickhouse-server
   when:
     - not clickhouse_install_client_only
