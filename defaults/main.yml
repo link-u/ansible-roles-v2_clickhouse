@@ -13,6 +13,7 @@ clickhouse_http_port: 8123              # web からの clickhouse アクセス�
 clickhouse_tcp_port: 9000               # clickhouse-client からのアクセス用ポート
 clickhouse_mysql_port: 9004             # mysql-client からのアクセス用ポート
 clickhouse_interserver_http_port: 9009  # clickhouse クラスタのノード間でデータを交換するためのポート
+clickhouse_prometheus_port: 8001        # Prometheus向けのmetricsを公開するためのポート
 clickhouse_logger_log: /var/log/clickhouse-server/clickhouse-server.log
 clickhouse_logger_errorlog: /var/log/clickhouse-server/clickhouse-server.err.log
 clickhouse_data_dir: /var/lib/clickhouse/      # ※ パス最後のスラッシュは残すこと
