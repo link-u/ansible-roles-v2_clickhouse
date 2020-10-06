@@ -9,6 +9,14 @@
         <count>10</count>
         <!-- <console>1</console> --> <!-- Default behavior is autodetection (log to console if not daemon mode and is tty) -->
     </logger>
+     <prometheus>
+        <!-- See: https://clickhouse.tech/docs/en/operations/server-configuration-parameters/settings/#server_configuration_parameters-prometheus -->
+        <endpoint>/metrics</endpoint>
+        <port>{{ clickhouse_prometheus_port }}</port>
+        <metrics>true</metrics>
+        <events>true</events>
+        <asynchronous_metrics>true</asynchronous_metrics>
+    </prometheus>
     <!--display_name>production</display_name--> <!-- It is the name that will be shown in the client -->
     <http_port>{{ clickhouse_http_port }}</http_port>
     <tcp_port>{{ clickhouse_tcp_port }}</tcp_port>
