@@ -1,5 +1,7 @@
 # ClickHouse
 
+![ansible ci](https://github.com/link-u/ansible-roles-v2_clickhouse/workflows/ansible%20ci/badge.svg)
+
 ## 概要
 
 ClickHouse をインストールする role
